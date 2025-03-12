@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Редактировать профиль</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Редактировать профиль</h2>
+    <form method="POST">
+        <div>
+            <label>ФИО:</label>
+            <input type="text" name="fio" value="{{ employee.fio }}" required>
+        </div>
+        <div>
+            <label>Дата рождения:</label>
+            <input type="date" name="birth_date" value="{{ employee.birth_date.strftime('%Y-%m-%d') }}" required>
+        </div>
+        <div>
+            <label>Должность:</label>
+            <input type="text" name="position" value="{{ employee.position }}" required>
+        </div>
+        <div>
+            <label>№ бұйрық бойынша:</label>
+            <input type="text" name="order_no" value="{{ employee.order_no }}" required>
+        </div>
+        <div>
+            <label>ВЛК дата:</label>
+            <input type="date" name="vlk_date" value="{{ employee.vlk_date.strftime('%Y-%m-%d') if employee.vlk_date else '' }}">
+        </div>
+        <div>
+            <label>ВЛК диагноз:</label>
+            <input type="text" name="vlk_diagnosis" value="{{ employee.vlk_diagnosis or '' }}">
+        </div>
+        <div>
+            <label>КМО дата:</label>
+            <input type="date" name="kmo_date" value="{{ employee.kmo_date.strftime('%Y-%m-%d') if employee.kmo_date else '' }}">
+        </div>
+        <div>
+            <label>КМО диагноз:</label>
+            <input type="text" name="kmo_diagnosis" value="{{ employee.kmo_diagnosis or '' }}">
+        </div>
+        <div>
+            <label>УМО дата:</label>
+            <input type="date" name="umo_date" value="{{ employee.umo_date.strftime('%Y-%m-%d') if employee.umo_date else '' }}">
+        </div>
+        <div>
+            <label>УМО диагноз:</label>
+            <input type="text" name="umo_diagnosis" value="{{ employee.umo_diagnosis or '' }}">
+        </div>
+        <div>
+            <label>КМО дата (вторая):</label>
+            <input type="date" name="kmo2_date" value="{{ employee.kmo2_date.strftime('%Y-%m-%d') if employee.kmo2_date else '' }}">
+        </div>
+        <div>
+            <label>КМО диагноз (второй):</label>
+            <input type="text" name="kmo2_diagnosis" value="{{ employee.kmo2_diagnosis or '' }}">
+        </div>
+        <div>
+            <label>Предполетное состояние:</label>
+            <input type="text" name="preflight_condition" value="{{ employee.preflight_condition or '' }}">
+        </div>
+        <button type="submit" class="btn">Сохранить</button>
+    </form>
+</body>
+</html>

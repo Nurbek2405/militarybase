@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Медицинский контроль</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>Ұлттық Ұлан № 3656 әскери бөлімі</h1>
+        <h2>Авиациялық қызметкерлердің денсаулық жағдайын медициналық бақылау</h2>
+        <h3>№ 699 бұйрық, 05.09.2019ж МВД РК</h3>
+    </div>
+
+    <a href="{{ url_for('add') }}" class="btn">Добавить сотрудника</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>№</th>
+                <th>ФИО</th>
+                <th>Дата рождения</th>
+                <th>Должность</th>
+                <th>№ бұйрық бойынша</th>
+                <th>ВЛК дата диагноз</th>
+                <th>КМО дата диагноз</th>
+                <th>УМО дата диагноз</th>
+                <th>КМО дата диагноз</th> <!-- Новый столбец для второго КМО -->
+                <th>ВЛК срок истекает</th>
+                <th>Предполетное состояние</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ employee.fio }}</td>
+                <td>{{ employee.birth_date.strftime('%Y-%m-%d') }}</td>
+                <td>{{ employee.position }}</td>
+                <td>{{ employee.order_no }}</td>
+                <td>{{ employee.vlk_date.strftime('%Y-%m-%d') if employee.vlk_date else '' }} {{ employee.vlk_diagnosis }}</td>
+                <td>{{ employee.kmo_date.strftime('%Y-%m-%d') if employee.kmo_date else '' }} {{ employee.kmo_diagnosis }}</td>
+                <td>{{ employee.umo_date.strftime('%Y-%m-%d') if employee.umo_date else '' }} {{ employee.umo_diagnosis }}</td>
+                <td>{{ employee.kmo2_date.strftime('%Y-%m-%d') if employee.kmo2_date else '' }} {{ employee.kmo2_diagnosis }}</td> <!-- Новый столбец -->
+                <td {% if employee.vlk_date and (employee.vlk_date + relativedelta(months=12) - datetime.now()).days < 30 %}class="warning"{% endif %}>
+                    {{ (employee.vlk_date + relativedelta(months=12)).strftime('%Y-%m-%d') if employee.vlk_date else '' }}
+                </td>
+                <td>{{ employee.preflight_condition }}</td>
+                <td>
+                    <a href="{{ url_for('edit', id=employee.id) }}">Редактировать</a>
+                    <a href="{{ url_for('delete', id=employee.id) }}" onclick="return confirm('Вы уверены?')">Удалить</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

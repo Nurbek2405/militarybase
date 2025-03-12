@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Добавить сотрудника</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Добавить нового сотрудника</h2>
+    <form method="POST">
+        <div>
+            <label>ФИО:</label>
+            <input type="text" name="fio" required>
+        </div>
+        <div>
+            <label>Дата рождения:</label>
+            <input type="date" name="birth_date" required>
+        </div>
+        <div>
+            <label>Должность:</label>
+            <input type="text" name="position" required>
+        </div>
+        <div>
+            <label>№ бұйрық бойынша:</label>
+            <input type="text" name="order_no" required>
+        </div>
+        <div>
+            <label>ВЛК дата:</label>
+            <input type="date" name="vlk_date">
+        </div>
+        <div>
+            <label>ВЛК диагноз:</label>
+            <input type="text" name="vlk_diagnosis">
+        </div>
+        <div>
+            <label>КМО дата:</label>
+            <input type="date" name="kmo_date">
+        </div>
+        <div>
+            <label>КМО диагноз:</label>
+            <input type="text" name="kmo_diagnosis">
+        </div>
+        <div>
+            <label>УМО дата:</label>
+            <input type="date" name="umo_date">
+        </div>
+        <div>
+            <label>УМО диагноз:</label>
+            <input type="text" name="umo_diagnosis">
+        </div>
+        <div>
+            <label>КМО дата (вторая):</label>
+            <input type="date" name="kmo2_date">
+        </div>
+        <div>
+            <label>КМО диагноз (второй):</label>
+            <input type="text" name="kmo2_diagnosis">
+        </div>
+        <div>
+            <label>Предполетное состояние:</label>
+            <input type="text" name="preflight_condition">
+        </div>
+        <button type="submit" class="btn">Добавить</button>
+    </form>
+</body>
+</html>
