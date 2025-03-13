@@ -1,65 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добавить сотрудника</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h2>Добавить нового сотрудника</h2>
-    <form method="POST">
-        <div>
-            <label>ФИО:</label>
-            <input type="text" name="fio" required>
-        </div>
-        <div>
-            <label>Дата рождения:</label>
-            <input type="date" name="birth_date" required>
-        </div>
-        <div>
-            <label>Должность:</label>
-            <input type="text" name="position" required>
-        </div>
-        <div>
-            <label>№ бұйрық бойынша:</label>
-            <input type="text" name="order_no" required>
-        </div>
-        <div>
-            <label>ВЛК дата:</label>
-            <input type="date" name="vlk_date">
-        </div>
-        <div>
-            <label>ВЛК диагноз:</label>
-            <input type="text" name="vlk_diagnosis">
-        </div>
-        <div>
-            <label>КМО дата:</label>
-            <input type="date" name="kmo_date">
-        </div>
-        <div>
-            <label>КМО диагноз:</label>
-            <input type="text" name="kmo_diagnosis">
-        </div>
-        <div>
-            <label>УМО дата:</label>
-            <input type="date" name="umo_date">
-        </div>
-        <div>
-            <label>УМО диагноз:</label>
-            <input type="text" name="umo_diagnosis">
-        </div>
-        <div>
-            <label>КМО дата (вторая):</label>
-            <input type="date" name="kmo2_date">
-        </div>
-        <div>
-            <label>КМО диагноз (второй):</label>
-            <input type="text" name="kmo2_diagnosis">
-        </div>
-        <div>
-            <label>Предполетное состояние:</label>
-            <input type="text" name="preflight_condition">
-        </div>
-        <button type="submit" class="btn">Добавить</button>
-    </form>
+    <div class="container mt-3">
+        <h2 class="mb-2">Добавить нового сотрудника</h2>
+        <form method="POST" id="employeeForm" class="compact-form">
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">ФИО:</label>
+                <div class="col">
+                    <input type="text" name="fio" class="form-control form-control-sm" required>
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">Дата рождения:</label>
+                <div class="col">
+                    <input type="date" name="birth_date" class="form-control form-control-sm" required>
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">Должность:</label>
+                <div class="col">
+                    <input type="text" name="position" class="form-control form-control-sm" required>
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">По приказу № 721:</label>
+                <div class="col">
+                    <input type="text" name="order_no" class="form-control form-control-sm" required>
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">ВЛК дата:</label>
+                <div class="col">
+                    <input type="date" name="vlk_date" class="form-control form-control-sm">
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">ВЛК диагноз:</label>
+                <div class="col">
+                    <input type="text" name="vlk_diagnosis" class="form-control form-control-sm">
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">КМО дата:</label>
+                <div class="col">
+                    <input type="date" name="kmo_date" class="form-control form-control-sm">
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">КМО диагноз:</label>
+                <div class="col">
+                    <input type="text" name="kmo_diagnosis" class="form-control form-control-sm">
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">УМО дата:</label>
+                <div class="col">
+                    <input type="date" name="umo_date" class="form-control form-control-sm">
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">УМО диагноз:</label>
+                <div class="col">
+                    <input type="text" name="umo_diagnosis" class="form-control form-control-sm">
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">КМО2 дата:</label>
+                <div class="col">
+                    <input type="date" name="kmo2_date" class="form-control form-control-sm">
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">КМО2 диагноз:</label>
+                <div class="col">
+                    <input type="text" name="kmo2_diagnosis" class="form-control form-control-sm">
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">Состояние:</label>
+                <div class="col">
+                    <select name="preflight_condition" class="form-select form-select-sm">
+                        {% for condition in preflight_conditions %}
+                            <option value="{{ condition }}" {% if condition == 'Допущен' %}selected{% endif %}>{{ condition }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row g-2 align-items-center mb-2">
+                <label class="col-auto col-form-label pe-1">Примечание:</label>
+                <div class="col">
+                    <input type="text" name="note" class="form-control form-control-sm">
+                </div>
+            </div>
+            <div class="row g-2">
+                <div class="col">
+                    <button type="submit" class="btn btn-primary btn-sm">Добавить</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('employeeForm').addEventListener('submit', function(event) {
+            const requiredFields = ['fio', 'birth_date', 'position', 'order_no'];
+            let valid = true;
+            let errorMessage = '';
+
+            requiredFields.forEach(field => {
+                const input = document.querySelector(`input[name="${field}"]`);
+                if (!input.value) {
+                    valid = false;
+                    errorMessage += `Поле "${input.previousElementSibling.textContent}" обязательно для заполнения.\n`;
+                }
+            });
+
+            if (!valid) {
+                event.preventDefault();
+                alert(errorMessage);
+            }
+        });
+    </script>
 </body>
 </html>

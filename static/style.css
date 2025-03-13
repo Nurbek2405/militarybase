@@ -1,76 +1,93 @@
+/* /static/style.css */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f0f0f0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7fa;
 }
 
 .header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
-    text-align: left;
-}
-
-th {
-    background-color: #4CAF50;
+    background-color: #343a40;
     color: white;
-}
-
-.warning {
-    background-color: #ffcccc;
-    color: #ff0000;
-    font-weight: bold;
-}
-
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    margin-bottom: 20px;
-}
-
-form {
-    background-color: white;
     padding: 20px;
+    border-radius: 8px;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.table-warning {
+    background-color: #ffff99; /* Желтая подсветка для сроков < 14 дней */
+}
+
+.table-danger {
+    background-color: #ffcccc; /* Красная подсветка для истекших сроков или отстраненных */
+}
+
+.alert {
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    max-width: 600px;
-    margin: 0 auto;
 }
 
-div {
-    margin-bottom: 15px;
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
 }
 
-label {
-    display: block;
-    margin-bottom: 5px;
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
 }
 
-a {
-    color: #4CAF50;
-    text-decoration: none;
-    margin-right: 10px;
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
+.pagination .installedpage-link {
+    color: #007bff;
+}
+
+.pagination .page-link:hover {
+    background-color: #e9ecef;
+}
+
+.form-label {
+    font-weight: bold;
+    margin-bottom: 0; /* Убираем отступ снизу для компактности */
+}
+
+.compact-form .form-control, .compact-form .form-select {
+    padding: 0.25rem 0.5rem; /* Уменьшаем внутренние отступы */
+}
+
+.compact-form .row {
+    margin-bottom: 0.5rem; /* Уменьшаем внешние отступы между строками */
+}
+
+.compact-form .col-auto {
+    width: auto; /* Минимизируем ширину меток */
 }

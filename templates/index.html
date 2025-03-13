@@ -1,58 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Медицинский контроль</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="header">
-        <h1>Ұлттық Ұлан № 3656 әскери бөлімі</h1>
-        <h2>Авиациялық қызметкерлердің денсаулық жағдайын медициналық бақылау</h2>
-        <h3>№ 699 бұйрық, 05.09.2019ж МВД РК</h3>
+    <div class="container mt-4">
+        <div class="header text-center mb-4">
+            <h1>Ұлттық Ұлан № 3656 әскери бөлімі</h1>
+            <h2>Авиациялық қызметкерлердің денсаулық жағдайын медициналық бақылау</h2>
+            <h3>№ 699 бұйрық, 05.09.2019ж МВД РК</h3>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                <a href="{{ url_for('add') }}" class="btn btn-primary">Добавить сотрудника</a>
+                <a href="{{ url_for('export_excel_xlsx') }}" class="btn btn-success">Экспорт .xlsx</a>
+                <a href="{{ url_for('export_excel_xls') }}" class="btn btn-success">Экспорт .xls</a>
+                <a href="{{ url_for('import_excel') }}" class="btn btn-info">Импорт Excel</a>
+            </div>
+            <form method="GET" action="{{ url_for('index') }}" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" placeholder="Поиск по ФИО" value="{{ request.args.get('search', '') }}">
+                <select name="sort" class="form-select me-2" style="width: auto;">
+                    <option value="fio_asc" {% if request.args.get('sort') == 'fio_asc' %}selected{% endif %}>По алфавиту (А-Я)</option>
+                    <option value="fio_desc" {% if request.args.get('sort') == 'fio_desc' %}selected{% endif %}>По алфавиту (Я-А)</option>
+                    <option value="deadline_asc" {% if request.args.get('sort', 'deadline_asc') == 'deadline_asc' %}selected{% endif %}>По ближайшему сроку</option>
+                    <option value="suspended" {% if request.args.get('sort') == 'suspended' %}selected{% endif %}>Только отстраненные</option>
+                </select>
+                <button type="submit" class="btn btn-secondary">Применить</button>
+            </form>
+        </div>
+
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>№</th>
+                    <th>ФИО</th>
+                    <th>Дата рождения</th>
+                    <th>Должность</th>
+                    <th>По приказу № 721</th>
+                    <th>ВЛК срок</th>
+                    <th>КМО срок</th>
+                    <th>УМО срок</th>
+                    <th>КМО2 срок</th>
+                    <th>Дней до осмотра</th>
+                    <th>Состояние</th>
+                    <th>Примечание</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in employees_with_expiry %}
+                {% set employee = item.employee %}
+                {% set has_warning = (item.vlk_days_left is not none and item.vlk_days_left <= 30) or
+                                    (item.kmo_days_left is not none and item.kmo_days_left <= 30) or
+                                    (item.umo_days_left is not none and item.umo_days_left <= 30) or
+                                    (item.kmo2_days_left is not none and item.kmo2_days_left <= 30) %}
+                {% set has_expired = (item.vlk_days_left is not none and item.vlk_days_left < 0) or
+                                    (item.kmo_days_left is not none and item.kmo_days_left < 0) or
+                                    (item.umo_days_left is not none and item.umo_days_left < 0) or
+                                    (item.kmo2_days_left is not none and item.kmo2_days_left < 0) %}
+                <tr class="{% if has_expired %}table-danger{% elif has_warning %}table-warning{% endif %}">
+                    <td>{{ loop.index + (page - 1) * per_page }}</td>
+                    <td>{{ employee.fio }}</td>
+                    <td>{{ employee.birth_date.strftime('%Y-%m-%d') if employee.birth_date else '' }}</td>
+                    <td>{{ employee.position }}</td>
+                    <td>{{ employee.order_no }}</td>
+                    <td>{{ item.vlk_expiry.strftime('%Y-%m-%d') if item.vlk_expiry else '' }}</td>
+                    <td>{{ item.kmo_expiry.strftime('%Y-%m-%d') if item.kmo_expiry else '' }}</td>
+                    <td>{{ item.umo_expiry.strftime('%Y-%m-%d') if item.umo_expiry else '' }}</td>
+                    <td>{{ item.kmo2_expiry.strftime('%Y-%m-%d') if item.kmo2_expiry else '' }}</td>
+                    <td>{{ item.min_days_left if item.min_days_left is not none else 'Нет данных' }}</td>
+                    <td>{{ employee.preflight_condition }}</td>
+                    <td>{{ employee.note or '' }}</td>
+                    <td>
+                        <a href="{{ url_for('history', id=employee.id) }}" class="btn btn-sm btn-info">История</a>
+                        <a href="{{ url_for('edit', id=employee.id) }}" class="btn btn-sm btn-warning">Редактировать</a>
+                        <a href="{{ url_for('delete', id=employee.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Вы уверены?')">Удалить</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-center mt-3">
+            <nav>
+                <ul class="pagination">
+                    {% if page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('index', page=page-1, per_page=per_page, sort=request.args.get('sort'), search=request.args.get('search')) }}">Назад</a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item disabled"><span class="page-link">Страница {{ page }} из {{ total_pages }}</span></li>
+                    {% if page < total_pages %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('index', page=page+1, per_page=per_page, sort=request.args.get('sort'), search=request.args.get('search')) }}">Вперед</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
     </div>
 
-    <a href="{{ url_for('add') }}" class="btn">Добавить сотрудника</a>
-
-    <table>
-        <thead>
-            <tr>
-                <th>№</th>
-                <th>ФИО</th>
-                <th>Дата рождения</th>
-                <th>Должность</th>
-                <th>№ бұйрық бойынша</th>
-                <th>ВЛК дата диагноз</th>
-                <th>КМО дата диагноз</th>
-                <th>УМО дата диагноз</th>
-                <th>КМО дата диагноз</th> <!-- Новый столбец для второго КМО -->
-                <th>ВЛК срок истекает</th>
-                <th>Предполетное состояние</th>
-                <th>Действия</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for employee in employees %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ employee.fio }}</td>
-                <td>{{ employee.birth_date.strftime('%Y-%m-%d') }}</td>
-                <td>{{ employee.position }}</td>
-                <td>{{ employee.order_no }}</td>
-                <td>{{ employee.vlk_date.strftime('%Y-%m-%d') if employee.vlk_date else '' }} {{ employee.vlk_diagnosis }}</td>
-                <td>{{ employee.kmo_date.strftime('%Y-%m-%d') if employee.kmo_date else '' }} {{ employee.kmo_diagnosis }}</td>
-                <td>{{ employee.umo_date.strftime('%Y-%m-%d') if employee.umo_date else '' }} {{ employee.umo_diagnosis }}</td>
-                <td>{{ employee.kmo2_date.strftime('%Y-%m-%d') if employee.kmo2_date else '' }} {{ employee.kmo2_diagnosis }}</td> <!-- Новый столбец -->
-                <td {% if employee.vlk_date and (employee.vlk_date + relativedelta(months=12) - datetime.now()).days < 30 %}class="warning"{% endif %}>
-                    {{ (employee.vlk_date + relativedelta(months=12)).strftime('%Y-%m-%d') if employee.vlk_date else '' }}
-                </td>
-                <td>{{ employee.preflight_condition }}</td>
-                <td>
-                    <a href="{{ url_for('edit', id=employee.id) }}">Редактировать</a>
-                    <a href="{{ url_for('delete', id=employee.id) }}" onclick="return confirm('Вы уверены?')">Удалить</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
