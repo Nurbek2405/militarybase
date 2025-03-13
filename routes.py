@@ -27,7 +27,7 @@ def register_routes(app):
         elif sort == 'suspended':
             query = query.filter(Employee.preflight_condition == 'Отстранен')
         elif sort == 'deadline_asc':
-            pass  # Сортировка будет через список ниже
+            pass
 
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
         employees = pagination.items
@@ -54,8 +54,6 @@ def register_routes(app):
             employees = [test_employee]
 
         employees_with_expiry = [calculate_expiry(emp) for emp in employees]
-
-        # Сохраняем изменения статуса и примечания в базе
         for emp in employees_with_expiry:
             db.session.add(emp['employee'])
         db.session.commit()
@@ -97,13 +95,14 @@ def register_routes(app):
 
                 employee = Employee(**employee_data)
                 db.session.add(employee)
-                db.session.flush()
+                db.session.flush()  # Получаем ID сотрудника
                 for exam in examinations:
                     db.session.add(Examination(employee_id=employee.id, **exam))
                 db.session.commit()
                 flash('Сотрудник успешно добавлен!', 'success')
                 return redirect(url_for('index'))
             except Exception as e:
+                db.session.rollback()
                 flash(f"Ошибка добавления сотрудника: {str(e)}", 'danger')
                 return redirect(url_for('add'))
         return render_template('add.html', preflight_conditions=PREFLIGHT_CONDITIONS)
@@ -159,26 +158,37 @@ def register_routes(app):
         ws = wb.active
         ws.title = "Сотрудники"
 
-        headers = ['ID', 'ФИО', 'Дата рождения', 'Должность', 'По приказу № 721', 'Состояние', 'Примечание',
-                   'Тип осмотра', 'Дата осмотра', 'Диагноз']
+        headers = [
+            'ID', 'ФИО', 'Дата рождения', 'Должность', 'По приказу № 721', 'Состояние', 'Примечание',
+            'ВЛК дата', 'ВЛК диагноз', 'КМО дата', 'КМО диагноз', 'УМО дата', 'УМО диагноз',
+            'КМО2 дата', 'КМО2 диагноз'
+        ]
         ws.append(headers)
 
         for emp in employees:
+            vlk_date = vlk_diagnosis = kmo_date = kmo_diagnosis = umo_date = umo_diagnosis = kmo2_date = kmo2_diagnosis = ''
+            for exam in emp.examinations:
+                if exam.exam_type == 'ВЛК':
+                    vlk_date = exam.exam_date.strftime('%Y-%m-%d')
+                    vlk_diagnosis = exam.diagnosis or ''
+                elif exam.exam_type == 'КМО':
+                    kmo_date = exam.exam_date.strftime('%Y-%m-%d')
+                    kmo_diagnosis = exam.diagnosis or ''
+                elif exam.exam_type == 'УМО':
+                    umo_date = exam.exam_date.strftime('%Y-%m-%d')
+                    umo_diagnosis = exam.diagnosis or ''
+                elif exam.exam_type == 'КМО2':
+                    kmo2_date = exam.exam_date.strftime('%Y-%m-%d')
+                    kmo2_diagnosis = exam.diagnosis or ''
+
             row = [
                 emp.id, emp.fio,
                 emp.birth_date.strftime('%Y-%m-%d') if emp.birth_date else '',
-                emp.position, emp.order_no, emp.preflight_condition, emp.note or ''
+                emp.position, emp.order_no, emp.preflight_condition, emp.note or '',
+                vlk_date, vlk_diagnosis, kmo_date, kmo_diagnosis, umo_date, umo_diagnosis,
+                kmo2_date, kmo2_diagnosis
             ]
-            if emp.examinations:
-                for exam in emp.examinations:
-                    ws.append(row + [
-                        exam.exam_type,
-                        exam.exam_date.strftime('%Y-%m-%d'),
-                        exam.diagnosis or ''
-                    ])
-                    row = [''] * 7
-            else:
-                ws.append(row)
+            ws.append(row)
 
         for col in range(1, len(headers) + 1):
             ws.column_dimensions[get_column_letter(col)].width = 15
@@ -200,36 +210,41 @@ def register_routes(app):
         wb = xlwt.Workbook(encoding='utf-8')
         ws = wb.add_sheet('Сотрудники')
 
-        headers = ['ID', 'ФИО', 'Дата рождения', 'Должность', 'По приказу № 721', 'Состояние', 'Примечание',
-                   'Тип осмотра', 'Дата осмотра', 'Диагноз']
+        headers = [
+            'ID', 'ФИО', 'Дата рождения', 'Должность', 'По приказу № 721', 'Состояние', 'Примечание',
+            'ВЛК дата', 'ВЛК диагноз', 'КМО дата', 'КМО диагноз', 'УМО дата', 'УМО диагноз',
+            'КМО2 дата', 'КМО2 диагноз'
+        ]
         for col, header in enumerate(headers):
             ws.write(0, col, header)
 
         row_num = 1
         for emp in employees:
+            vlk_date = vlk_diagnosis = kmo_date = kmo_diagnosis = umo_date = umo_diagnosis = kmo2_date = kmo2_diagnosis = ''
+            for exam in emp.examinations:
+                if exam.exam_type == 'ВЛК':
+                    vlk_date = exam.exam_date.strftime('%Y-%m-%d')
+                    vlk_diagnosis = exam.diagnosis or ''
+                elif exam.exam_type == 'КМО':
+                    kmo_date = exam.exam_date.strftime('%Y-%m-%d')
+                    kmo_diagnosis = exam.diagnosis or ''
+                elif exam.exam_type == 'УМО':
+                    umo_date = exam.exam_date.strftime('%Y-%m-%d')
+                    umo_diagnosis = exam.diagnosis or ''
+                elif exam.exam_type == 'КМО2':
+                    kmo2_date = exam.exam_date.strftime('%Y-%m-%d')
+                    kmo2_diagnosis = exam.diagnosis or ''
+
             row = [
                 emp.id, emp.fio,
                 emp.birth_date.strftime('%Y-%m-%d') if emp.birth_date else '',
-                emp.position, emp.order_no, emp.preflight_condition, emp.note or ''
+                emp.position, emp.order_no, emp.preflight_condition, emp.note or '',
+                vlk_date, vlk_diagnosis, kmo_date, kmo_diagnosis, umo_date, umo_diagnosis,
+                kmo2_date, kmo2_diagnosis
             ]
-            if emp.examinations:
-                for exam in emp.examinations:
-                    ws.write(row_num, 0, row[0])
-                    ws.write(row_num, 1, row[1])
-                    ws.write(row_num, 2, row[2])
-                    ws.write(row_num, 3, row[3])
-                    ws.write(row_num, 4, row[4])
-                    ws.write(row_num, 5, row[5])
-                    ws.write(row_num, 6, row[6])
-                    ws.write(row_num, 7, exam.exam_type)
-                    ws.write(row_num, 8, exam.exam_date.strftime('%Y-%m-%d'))
-                    ws.write(row_num, 9, exam.diagnosis or '')
-                    row = [''] * 7
-                    row_num += 1
-            else:
-                for col, value in enumerate(row):
-                    ws.write(row_num, col, value)
-                row_num += 1
+            for col, value in enumerate(row):
+                ws.write(row_num, col, value)
+            row_num += 1
 
         output = BytesIO()
         wb.save(output)
@@ -273,53 +288,51 @@ def register_routes(app):
                         else:
                             data = [str(cell) if cell else '' for cell in row]
 
-                        if data[0]:
-                            fio = data[1]
-                            existing_employee = Employee.query.filter_by(fio=fio).first()
-                            if existing_employee:
-                                skipped_count += 1
-                                continue
+                        fio = data[1]
+                        existing_employee = Employee.query.filter_by(fio=fio).first()
+                        if existing_employee:
+                            skipped_count += 1
+                            continue
 
-                            birth_date_str = data[2]
-                            if birth_date_str:
-                                try:
-                                    birth_date = datetime.strptime(str(birth_date_str), '%Y-%m-%d')
-                                except ValueError:
-                                    flash(f"Неверный формат даты рождения для {fio}: {birth_date_str}", 'danger')
-                                    return redirect(url_for('import_excel'))
-                            else:
-                                birth_date = None
+                        birth_date_str = data[2]
+                        if birth_date_str:
+                            try:
+                                birth_date = datetime.strptime(str(birth_date_str), '%Y-%m-%d')
+                            except ValueError:
+                                flash(f"Неверный формат даты рождения для {fio}: {birth_date_str}", 'danger')
+                                return redirect(url_for('import_excel'))
+                        else:
+                            birth_date = None
 
-                            current_employee = Employee(
-                                fio=fio,
-                                birth_date=birth_date,
-                                position=data[3],
-                                order_no=data[4],
-                                preflight_condition=data[5] if data[5] in PREFLIGHT_CONDITIONS else 'Допущен',
-                                note=data[6] if data[6] else None
-                            )
-                            db.session.add(current_employee)
-                            db.session.flush()
+                        employee = Employee(
+                            fio=fio,
+                            birth_date=birth_date,
+                            position=data[3],
+                            order_no=data[4],
+                            preflight_condition=data[5] if data[5] in PREFLIGHT_CONDITIONS else 'Допущен',
+                            note=data[6] if data[6] else None
+                        )
+                        db.session.add(employee)
+                        db.session.flush()
 
-                        if len(data) > 7 and data[7] and current_employee:
-                            exam_date_str = data[8]
+                        for i, exam_type in enumerate(['ВЛК', 'КМО', 'УМО', 'КМО2']):
+                            date_idx = 7 + i * 2
+                            diag_idx = 8 + i * 2
+                            exam_date_str = data[date_idx]
                             if exam_date_str:
                                 try:
                                     exam_date = datetime.strptime(str(exam_date_str), '%Y-%m-%d')
+                                    exam = Examination(
+                                        employee_id=employee.id,
+                                        exam_type=exam_type,
+                                        exam_date=exam_date,
+                                        diagnosis=data[diag_idx] if data[diag_idx] else None
+                                    )
+                                    db.session.add(exam)
                                 except ValueError:
-                                    flash(f"Неверный формат даты осмотра для {current_employee.fio}: {exam_date_str}",
+                                    flash(f"Неверный формат даты осмотра {exam_type} для {fio}: {exam_date_str}",
                                           'danger')
                                     return redirect(url_for('import_excel'))
-                            else:
-                                exam_date = None
-
-                            exam = Examination(
-                                employee_id=current_employee.id,
-                                exam_type=data[7],
-                                exam_date=exam_date,
-                                diagnosis=data[9] if data[9] else None
-                            )
-                            db.session.add(exam)
 
                     db.session.commit()
                     flash(f'Сотрудники успешно импортированы из Excel! Пропущено дубликатов: {skipped_count}',

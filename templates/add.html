@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container mt-3">
-        <h2 class="mb-2">Добавить нового сотрудника</h2>
+        <h2 class="mb-2">Добавить сотрудника</h2>
         <form method="POST" id="employeeForm" class="compact-form">
             <div class="row g-2 align-items-center mb-2">
                 <label class="col-auto col-form-label pe-1">ФИО:</label>
@@ -35,54 +35,23 @@
                     <input type="text" name="order_no" class="form-control form-control-sm" required>
                 </div>
             </div>
+
+            <!-- Осмотры -->
+            {% for exam_type in ['ВЛК', 'КМО', 'УМО', 'КМО2'] %}
             <div class="row g-2 align-items-center mb-2">
-                <label class="col-auto col-form-label pe-1">ВЛК дата:</label>
+                <label class="col-auto col-form-label pe-1">{{ exam_type }} дата:</label>
                 <div class="col">
-                    <input type="date" name="vlk_date" class="form-control form-control-sm">
+                    <input type="date" name="{{ exam_type.lower() }}_date" class="form-control form-control-sm">
                 </div>
             </div>
             <div class="row g-2 align-items-center mb-2">
-                <label class="col-auto col-form-label pe-1">ВЛК диагноз:</label>
+                <label class="col-auto col-form-label pe-1">{{ exam_type }} диагноз:</label>
                 <div class="col">
-                    <input type="text" name="vlk_diagnosis" class="form-control form-control-sm">
+                    <input type="text" name="{{ exam_type.lower() }}_diagnosis" class="form-control form-control-sm">
                 </div>
             </div>
-            <div class="row g-2 align-items-center mb-2">
-                <label class="col-auto col-form-label pe-1">КМО дата:</label>
-                <div class="col">
-                    <input type="date" name="kmo_date" class="form-control form-control-sm">
-                </div>
-            </div>
-            <div class="row g-2 align-items-center mb-2">
-                <label class="col-auto col-form-label pe-1">КМО диагноз:</label>
-                <div class="col">
-                    <input type="text" name="kmo_diagnosis" class="form-control form-control-sm">
-                </div>
-            </div>
-            <div class="row g-2 align-items-center mb-2">
-                <label class="col-auto col-form-label pe-1">УМО дата:</label>
-                <div class="col">
-                    <input type="date" name="umo_date" class="form-control form-control-sm">
-                </div>
-            </div>
-            <div class="row g-2 align-items-center mb-2">
-                <label class="col-auto col-form-label pe-1">УМО диагноз:</label>
-                <div class="col">
-                    <input type="text" name="umo_diagnosis" class="form-control form-control-sm">
-                </div>
-            </div>
-            <div class="row g-2 align-items-center mb-2">
-                <label class="col-auto col-form-label pe-1">КМО2 дата:</label>
-                <div class="col">
-                    <input type="date" name="kmo2_date" class="form-control form-control-sm">
-                </div>
-            </div>
-            <div class="row g-2 align-items-center mb-2">
-                <label class="col-auto col-form-label pe-1">КМО2 диагноз:</label>
-                <div class="col">
-                    <input type="text" name="kmo2_diagnosis" class="form-control form-control-sm">
-                </div>
-            </div>
+            {% endfor %}
+
             <div class="row g-2 align-items-center mb-2">
                 <label class="col-auto col-form-label pe-1">Состояние:</label>
                 <div class="col">
@@ -102,6 +71,7 @@
             <div class="row g-2">
                 <div class="col">
                     <button type="submit" class="btn btn-primary btn-sm">Добавить</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary btn-sm">Назад</a>
                 </div>
             </div>
         </form>

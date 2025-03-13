@@ -66,14 +66,8 @@
             <tbody>
                 {% for item in employees_with_expiry %}
                 {% set employee = item.employee %}
-                {% set has_warning = (item.vlk_days_left is not none and item.vlk_days_left <= 30) or
-                                    (item.kmo_days_left is not none and item.kmo_days_left <= 30) or
-                                    (item.umo_days_left is not none and item.umo_days_left <= 30) or
-                                    (item.kmo2_days_left is not none and item.kmo2_days_left <= 30) %}
-                {% set has_expired = (item.vlk_days_left is not none and item.vlk_days_left < 0) or
-                                    (item.kmo_days_left is not none and item.kmo_days_left < 0) or
-                                    (item.umo_days_left is not none and item.umo_days_left < 0) or
-                                    (item.kmo2_days_left is not none and item.kmo2_days_left < 0) %}
+                {% set has_warning = item.min_days_left is not none and item.min_days_left <= 30 and item.min_days_left >= 0 %}
+                {% set has_expired = item.min_days_left is not none and item.min_days_left < 0 %}
                 <tr class="{% if has_expired %}table-danger{% elif has_warning %}table-warning{% endif %}">
                     <td>{{ loop.index + (page - 1) * per_page }}</td>
                     <td>{{ employee.fio }}</td>
@@ -84,7 +78,18 @@
                     <td>{{ item.kmo_expiry.strftime('%Y-%m-%d') if item.kmo_expiry else '' }}</td>
                     <td>{{ item.umo_expiry.strftime('%Y-%m-%d') if item.umo_expiry else '' }}</td>
                     <td>{{ item.kmo2_expiry.strftime('%Y-%m-%d') if item.kmo2_expiry else '' }}</td>
-                    <td>{{ item.min_days_left if item.min_days_left is not none else 'Нет данных' }}</td>
+                    <td>
+                        {% if item.min_days_left is not none %}
+                            {{ item.nearest_exam }}:
+                            {% if item.min_days_left < 0 %}
+                                Просрочен на {{-item.min_days_left}} дней
+                            {% else %}
+                                {{ item.min_days_left }} дней
+                            {% endif %}
+                        {% else %}
+                            Нет данных
+                        {% endif %}
+                    </td>
                     <td>{{ employee.preflight_condition }}</td>
                     <td>{{ employee.note or '' }}</td>
                     <td>

@@ -19,4 +19,4 @@ if __name__ == '__main__':
         except OperationalError as e:
             print(f"Ошибка подключения к базе данных: {e}")
             sys.exit(1)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=8080)
